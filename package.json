@@ -1,0 +1,11 @@
+{
+  "name": "js-dsl",
+  "version": "1.0.0",
+  "devDependencies": {
+    "mocha": "^2.2.1",
+    "should": "^5.1.0"
+  },
+  "dependencies": {
+    "lodash": "^3.5.0"
+  }
+}

@@ -1,0 +1,38 @@
+Keywords:
+
+test
+fields
+size
+each
+object
+array
+string
+number
+boolean
+true
+false
+should
+not
+be
+equal
+
+
+Legend:
+
+i = Identifier
+t = Literal
+e = null
+
+
+Productions:
+
+Z => test t {
+S => fields {
+S => each {
+S => }
+S => A should BCE
+A => size | i | e
+B => not | e
+C => be | equal
+E => F | t
+F => object | array | string | number | boolean | true | false
