@@ -11,7 +11,7 @@ function LexerException(message) {
 LexerException.prototype = Object.create(Error.prototype);
 LexerException.prototype.constructor = LexerException;
 
-module.exports = function(input) {
+module.exports = (input) => {
   if (!input || input.trim() === '') {
     throw new LexerException('No input provided');
   }
@@ -21,11 +21,9 @@ module.exports = function(input) {
   let pointer = 0;
   let token = '';
   let state = 1;
-  let lines = input.split(os.EOL).map(function(l) {
-    return l + os.EOL + ' ';
-  });
+  let lines = input.split(os.EOL).map((l) => l + os.EOL + ' ');
 
-  let addToken = function(type, literal, backtrack) {
+  let addToken = (type, literal, backtrack) => {
     tokens.push({ type: type, literal: literal });
     token = '';
     state = 1;
@@ -38,7 +36,7 @@ module.exports = function(input) {
   let done = false;
   do {
     let currentChar = lines[line][pointer];
-    let column = _.findIndex(util.lexTable[0], function(regex) {
+    let column = _.findIndex(util.lexTable[0], (regex) => {
       return currentChar.match(regex);
     });
 
@@ -91,7 +89,7 @@ module.exports = function(input) {
   let tokenIndex = -1;
   return {
 
-    next: function() {
+    next: () => {
       if (tokenIndex > tokens.length) {
         return { value: null };
       }
