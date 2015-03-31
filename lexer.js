@@ -91,12 +91,13 @@ module.exports = (input) => {
 
     next: () => {
       if (tokenIndex > tokens.length) {
-        return { value: null };
+        throw Exception();
       }
 
       tokenIndex++;
       return {
-        value: tokens[tokenIndex]
+        value: tokens[tokenIndex],
+        done: (tokenIndex >= tokens.length)
       };
     }
 
