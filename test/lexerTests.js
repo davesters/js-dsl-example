@@ -1,112 +1,180 @@
-var lexer = require('./../lexer')();
+var lexer = require('./../lexer');
 var should = require('should');
 
 describe('Lexer', function() {
 
+  it('throws error on no input', function() {
+    (lexer).should.throw('No input provided');
+  });
+
   it('returns correct tokens for (Z => test t {)', function() {
-    var tokens = lexer('test http://test.api {', 1);
+    var tokens = lexer('test http://test.api {');
 
-    tokens[0].type.should.equal('kwd');
-    tokens[0].literal.should.equal('test');
+    var token = tokens.next().value;
+    token.type.should.equal('kwd');
+    token.literal.should.equal('test');
 
-    tokens[1].type.should.equal('id');
-    tokens[1].literal.should.equal('http://test.api');
+    token = tokens.next().value;
+    token.type.should.equal('id');
+    token.literal.should.equal('http://test.api');
 
-    tokens[2].type.should.equal('op');
-    tokens[2].literal.should.equal('{');
+    token = tokens.next().value;
+    token.type.should.equal('op');
+    token.literal.should.equal('{');
+
+    token = tokens.next().value;
+    token.type.should.equal('eof');
   });
 
   it('returns correct tokens for (S => fields {)', function() {
-    var tokens = lexer('fields {', 1);
+    var tokens = lexer('fields {');
 
-    tokens[0].type.should.equal('kwd');
-    tokens[0].literal.should.equal('fields');
+    var token = tokens.next().value;
+    token.type.should.equal('kwd');
+    token.literal.should.equal('fields');
 
-    tokens[1].type.should.equal('op');
-    tokens[1].literal.should.equal('{');
+    token = tokens.next().value;
+    token.type.should.equal('op');
+    token.literal.should.equal('{');
+
+    token = tokens.next().value;
+    token.type.should.equal('eof');
   });
 
   it('returns correct tokens for (S => each {)', function() {
-    var tokens = lexer('each {', 1);
+    var tokens = lexer('each {');
 
-    tokens[0].type.should.equal('kwd');
-    tokens[0].literal.should.equal('each');
+    var token = tokens.next().value;
+    token.type.should.equal('kwd');
+    token.literal.should.equal('each');
 
-    tokens[1].type.should.equal('op');
-    tokens[1].literal.should.equal('{');
+    token = tokens.next().value;
+    token.type.should.equal('op');
+    token.literal.should.equal('{');
+
+    token = tokens.next().value;
+    token.type.should.equal('eof');
   });
 
   it('returns correct tokens for (S => })', function() {
-    var tokens = lexer('}', 1);
+    var tokens = lexer('}');
 
-    tokens[0].type.should.equal('cl');
-    tokens[0].literal.should.equal('}');
+    var token = tokens.next().value;
+    token.type.should.equal('cl');
+    token.literal.should.equal('}');
+
+    token = tokens.next().value;
+    token.type.should.equal('eof');
   });
 
   it('returns correct tokens for (S => A should BCE)', function() {
-    var tokens = lexer('count should equal 10', 1);
+    var tokens = lexer('count should equal 10');
 
-    tokens[0].type.should.equal('id');
-    tokens[0].literal.should.equal('count');
+    var token = tokens.next().value;
+    token.type.should.equal('id');
+    token.literal.should.equal('count');
 
-    tokens[1].type.should.equal('kwd');
-    tokens[1].literal.should.equal('should');
+    token = tokens.next().value;
+    token.type.should.equal('kwd');
+    token.literal.should.equal('should');
 
-    tokens[2].type.should.equal('kwd');
-    tokens[2].literal.should.equal('equal');
+    token = tokens.next().value;
+    token.type.should.equal('kwd');
+    token.literal.should.equal('equal');
 
-    tokens[3].type.should.equal('num');
-    tokens[3].literal.should.equal(10);
+    token = tokens.next().value;
+    token.type.should.equal('num');
+    token.literal.should.equal(10);
+
+    token = tokens.next().value;
+    token.type.should.equal('eof');
   });
 
   it('returns correct tokens for (S => A should BCE) with null A', function() {
-    var tokens = lexer('should be object', 1);
+    var tokens = lexer('should be object');
 
-    tokens[0].type.should.equal('kwd');
-    tokens[0].literal.should.equal('should');
+    var token = tokens.next().value;
+    token.type.should.equal('kwd');
+    token.literal.should.equal('should');
 
-    tokens[1].type.should.equal('kwd');
-    tokens[1].literal.should.equal('be');
+    token = tokens.next().value;
+    token.type.should.equal('kwd');
+    token.literal.should.equal('be');
 
-    tokens[2].type.should.equal('kwd');
-    tokens[2].literal.should.equal('object');
+    token = tokens.next().value;
+    token.type.should.equal('kwd');
+    token.literal.should.equal('object');
+
+    token = tokens.next().value;
+    token.type.should.equal('eof');
   });
 
   it('returns token with negative number', function() {
-    var tokens = lexer('-10', 1);
+    var tokens = lexer('-10');
 
-    tokens[0].type.should.equal('num');
-    tokens[0].literal.should.equal(-10);
+    var token = tokens.next().value;
+    token.type.should.equal('num');
+    token.literal.should.equal(-10);
+
+    token = tokens.next().value;
+    token.type.should.equal('eof');
   });
 
   it('returns token with decimal number', function() {
-    var tokens = lexer('99.9', 1);
+    var tokens = lexer('99.9');
 
-    tokens[0].type.should.equal('num');
-    tokens[0].literal.should.equal(99.9);
+    var token = tokens.next().value;
+    token.type.should.equal('num');
+    token.literal.should.equal(99.9);
+
+    token = tokens.next().value;
+    token.type.should.equal('eof');
   });
 
-  it('returns empty array on empty input', function() {
-    var tokens = lexer('', 1);
+  it('returns correct tokens for multiline block', function() {
+    var tokens = lexer('test http://test.api {\n\n}');
 
-    tokens.length.should.equal(0);
+    var token = tokens.next().value;
+    token.type.should.equal('kwd');
+    token.literal.should.equal('test');
+
+    token = tokens.next().value;
+    token.type.should.equal('id');
+    token.literal.should.equal('http://test.api');
+
+    token = tokens.next().value;
+    token.type.should.equal('op');
+    token.literal.should.equal('{');
+
+    token = tokens.next().value;
+    token.type.should.equal('cl');
+    token.literal.should.equal('}');
+
+    token = tokens.next().value;
+    token.type.should.equal('eof');
+  });
+
+  it('throws unidentified character error line 3', function() {
+    (function() {
+      lexer('test {\n\n $');
+    }).should.throw('Unidentified character "$" on line: 3, char: 2');
   });
 
   it('throws unidentified character error on first char', function() {
     (function() {
-      lexer('$', 1);
+      lexer('$');
     }).should.throw('Unidentified character "$" on line: 1, char: 1');
   });
 
   it('throws unidentified character error on fifth char', function() {
     (function() {
-      lexer('test $', 1);
+      lexer('test $');
     }).should.throw('Unidentified character "$" on line: 1, char: 6');
   });
 
   it('throws unexpected character error on third char', function() {
     (function() {
-      lexer('10.0.', 1);
+      lexer('10.0.');
     }).should.throw('Unexpected character "." on line: 1, char: 5');
   });
 
