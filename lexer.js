@@ -77,6 +77,7 @@ module.exports = (input) => {
     }
 
     if (pointer >= lines[line].length) {
+      addToken('eol');
       line++;
       pointer = 0;
     }

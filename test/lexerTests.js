@@ -23,6 +23,9 @@ describe('Lexer', function() {
     token.literal.should.equal('{');
 
     token = tokens.next().value;
+    token.type.should.equal('eol');
+
+    token = tokens.next().value;
     token.type.should.equal('eof');
   });
 
@@ -36,6 +39,9 @@ describe('Lexer', function() {
     token = tokens.next().value;
     token.type.should.equal('op');
     token.literal.should.equal('{');
+
+    token = tokens.next().value;
+    token.type.should.equal('eol');
 
     token = tokens.next().value;
     token.type.should.equal('eof');
@@ -53,6 +59,9 @@ describe('Lexer', function() {
     token.literal.should.equal('{');
 
     token = tokens.next().value;
+    token.type.should.equal('eol');
+
+    token = tokens.next().value;
     token.type.should.equal('eof');
   });
 
@@ -62,6 +71,9 @@ describe('Lexer', function() {
     var token = tokens.next().value;
     token.type.should.equal('cl');
     token.literal.should.equal('}');
+
+    token = tokens.next().value;
+    token.type.should.equal('eol');
 
     token = tokens.next().value;
     token.type.should.equal('eof');
@@ -87,6 +99,9 @@ describe('Lexer', function() {
     token.literal.should.equal(10);
 
     token = tokens.next().value;
+    token.type.should.equal('eol');
+
+    token = tokens.next().value;
     token.type.should.equal('eof');
   });
 
@@ -106,6 +121,9 @@ describe('Lexer', function() {
     token.literal.should.equal('object');
 
     token = tokens.next().value;
+    token.type.should.equal('eol');
+
+    token = tokens.next().value;
     token.type.should.equal('eof');
   });
 
@@ -117,6 +135,9 @@ describe('Lexer', function() {
     token.literal.should.equal(-10);
 
     token = tokens.next().value;
+    token.type.should.equal('eol');
+
+    token = tokens.next().value;
     token.type.should.equal('eof');
   });
 
@@ -126,6 +147,9 @@ describe('Lexer', function() {
     var token = tokens.next().value;
     token.type.should.equal('num');
     token.literal.should.equal(99.9);
+
+    token = tokens.next().value;
+    token.type.should.equal('eol');
 
     token = tokens.next().value;
     token.type.should.equal('eof');
@@ -147,8 +171,17 @@ describe('Lexer', function() {
     token.literal.should.equal('{');
 
     token = tokens.next().value;
+    token.type.should.equal('eol');
+
+    token = tokens.next().value;
+    token.type.should.equal('eol');
+
+    token = tokens.next().value;
     token.type.should.equal('cl');
     token.literal.should.equal('}');
+
+    token = tokens.next().value;
+    token.type.should.equal('eol');
 
     token = tokens.next().value;
     token.type.should.equal('eof');
