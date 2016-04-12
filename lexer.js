@@ -5,112 +5,119 @@ let util = require('./util');
 let os = require('os');
 
 function LexerException(message) {
-  this.name = 'LexerException';
-  this.message = message;
+	this.name = 'LexerException';
+	this.message = message;
 }
 LexerException.prototype = Object.create(Error.prototype);
 LexerException.prototype.constructor = LexerException;
 
 module.exports = (input) => {
-  if (!input || input.trim() === '') {
-    throw new LexerException('No input provided');
-  }
+	if (!input || input.trim() === '') {
+		throw new LexerException('No input provided');
+	}
 
-  let tokens = [];
-  let line = 0;
-  let pointer = 0;
-  let token = '';
-  let state = 1;
-  let lines = input.split(os.EOL).map((l) => l + os.EOL + ' ');
+	let tokens = [];
+	let line = 0;
+	let pointer = 0;
+	let token = '';
+	let state = 1;
+	let lines = input.split(os.EOL).map((l) => l + os.EOL + ' ');
 
-  let addToken = (type, literal, backtrack) => {
-        tokens.push({
-            type: type,
-            literal: literal,
-            line: line + 1,
-            char: pointer - ((literal) ? literal.length : 0),
-        });
-        token = '';
-        state = 1;
+	let addToken = (type, literal, backtrack) => {
+		let charPos = pointer;
+		if (literal && literal !== '{' && literal != '}') {
+			charPos -= literal.toString().length;
+			if (type === 'str') {
+				charPos--;
+			}
+		}
+		
+		tokens.push({
+			type: type,
+			literal: literal,
+			line: line + 1,
+			char: charPos,
+		});
+		token = '';
+		state = 1;
 
-        if (backtrack) {
-            pointer--;
-        }
-  };
+		if (backtrack) {
+			pointer--;
+		}
+	};
 
-  do {
-    let currentChar = lines[line][pointer];
-    let column = _.findIndex(util.lexTable[0], (regex) => {
-      return currentChar.match(regex);
-    });
+	do {
+		let currentChar = lines[line][pointer];
+		let column = _.findIndex(util.lexTable[0], (regex) => {
+			return currentChar.match(regex);
+		});
 
-    if (column < 0) {
-      throw new LexerException('Unidentified character "' + currentChar + '" on line: ' + (line + 1) + ', char: ' + (pointer + 1));
-    }
+		if (column < 0) {
+			throw new LexerException('Unidentified character "' + currentChar + '" on line: ' + (line + 1) + ', char: ' + (pointer + 1));
+		}
 
-    state = util.lexTable[state][column];
+		state = util.lexTable[state][column];
 
-    pointer++;
-    switch (state) {
-      case 0:
-        throw new LexerException('Unexpected character "' + currentChar + '" on line: ' + (line + 1) + ', char: ' + pointer);
-      case 1:
-        break;
-      case 3: // End Identifier
-        if (util.keywords.indexOf(token.toLowerCase()) != -1) {
-          addToken('kwd', token.toLowerCase(), true);
-        } else {
-          addToken('id', token, true);
-        }
-        break;
-      case 5: // End Number
-      case 10: // End Decimal
-        addToken('num', parseFloat(token, 2), true);
-        break;
-      case 7: // End String
-        token = token.substring(1); 
-        addToken('str', token);
-        break;
-      case 12: // Found start block
-        addToken('op', '{');
-        break;
-      case 13: // End start block
-        addToken('cl', '}');
-        break;
-      default:
-        token += currentChar;
-    }
+		pointer++;
+		switch (state) {
+			case 0:
+				throw new LexerException('Unexpected character "' + currentChar + '" on line: ' + (line + 1) + ', char: ' + pointer);
+			case 1:
+				break;
+			case 3: // End Identifier
+				if (util.keywords.indexOf(token.toLowerCase()) != -1) {
+					addToken('kwd', token.toLowerCase(), true);
+				} else {
+					addToken('id', token, true);
+				}
+				break;
+			case 5: // End Number
+			case 10: // End Decimal
+				addToken('num', parseFloat(token, 2), true);
+				break;
+			case 7: // End String
+				token = token.substring(1);
+				addToken('str', token);
+				break;
+			case 12: // Found start block
+				addToken('op', '{');
+				break;
+			case 13: // End start block
+				addToken('cl', '}');
+				break;
+			default:
+				token += currentChar;
+		}
 
-    if (pointer >= lines[line].length) {
-    //   addToken('eol');
-      line++;
-      pointer = 0;
-    }
-    
-    if (line >= lines.length) {
-      addToken('eof');
-      break;
-    }
-  } while(true)
+		if (pointer >= lines[line].length) {
+			line++;
+			pointer = 0;
+		}
 
-  let tokenIndex = -1;
-  return {
+		if (line >= lines.length) {
+			addToken('eof');
+			break;
+		}
+	} while (true)
 
-    next: () => {
-      if (tokenIndex > tokens.length) {
-        throw new LexerException('No more tokens');
-      }
+	let tokenIndex = -1;
+	return {
 
-      tokenIndex++;
-      return {
-        value: tokens[tokenIndex],
-        done: (tokenIndex >= tokens.length)
-      };
-    },
-    
-    backup: () => {
-        tokenIndex--;
-    },
+		next: () => {
+			if (tokenIndex > tokens.length) {
+				throw new LexerException('No more tokens');
+			}
 
-  };
+			tokenIndex++;
+			return {
+				value: tokens[tokenIndex],
+				done: tokens[tokenIndex].type === 'eof',
+			};
+		},
+
+		backup: () => {
+			tokenIndex--;
+		},
+
+	};
 };
