@@ -26,13 +26,14 @@ e = null
 
 Productions:
 
-Z => test t {
-S => fields {
-S => each {
-S => }
-S => A should BCE
-A => size | i | e
+Z => S
+S => test t { T }
+T => fields F { T }
+T => each F { T }
+T => A should BCE
+T => e
+A => size | i | t | e
 B => not | e
 C => be | equal
-E => F | t
-F => object | array | string | number | boolean | true | false
+E => object | array | string | number | boolean | true | false | t
+F => i | t | e

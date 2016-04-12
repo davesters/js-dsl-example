@@ -1,0 +1,24 @@
+test "https://api.github.com/users/davesters/repos" {
+
+  should be array
+  size should equal 19
+
+  each {
+
+    should be object
+    size should equal 67
+
+    fields {
+      private should equal false
+
+      fields owner {
+        login should be string
+        id should equal 439674
+        name should equal "David Corona"
+        site_admin should not equal true
+      }
+    }
+
+  }
+
+}

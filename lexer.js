@@ -24,16 +24,20 @@ module.exports = (input) => {
   let lines = input.split(os.EOL).map((l) => l + os.EOL + ' ');
 
   let addToken = (type, literal, backtrack) => {
-    tokens.push({ type: type, literal: literal });
-    token = '';
-    state = 1;
+        tokens.push({
+            type: type,
+            literal: literal,
+            line: line + 1,
+            char: pointer - ((literal) ? literal.length : 0),
+        });
+        token = '';
+        state = 1;
 
-    if (backtrack) {
-      pointer--;
-    }
+        if (backtrack) {
+            pointer--;
+        }
   };
 
-  let done = false;
   do {
     let currentChar = lines[line][pointer];
     let column = _.findIndex(util.lexTable[0], (regex) => {
@@ -61,10 +65,11 @@ module.exports = (input) => {
         break;
       case 5: // End Number
       case 10: // End Decimal
-        addToken('num', Number(token), true);
+        addToken('num', parseFloat(token, 2), true);
         break;
       case 7: // End String
-        addToken('str', token, true);
+        token = token.substring(1); 
+        addToken('str', token);
         break;
       case 12: // Found start block
         addToken('op', '{');
@@ -77,22 +82,23 @@ module.exports = (input) => {
     }
 
     if (pointer >= lines[line].length) {
-      addToken('eol');
+    //   addToken('eol');
       line++;
       pointer = 0;
     }
+    
     if (line >= lines.length) {
       addToken('eof');
-      done = true;
+      break;
     }
-  } while(!done)
+  } while(true)
 
   let tokenIndex = -1;
   return {
 
     next: () => {
       if (tokenIndex > tokens.length) {
-        throw Exception();
+        throw new LexerException('No more tokens');
       }
 
       tokenIndex++;
@@ -100,7 +106,11 @@ module.exports = (input) => {
         value: tokens[tokenIndex],
         done: (tokenIndex >= tokens.length)
       };
-    }
+    },
+    
+    backup: () => {
+        tokenIndex--;
+    },
 
   };
 };

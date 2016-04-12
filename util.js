@@ -1,3 +1,4 @@
+"use strict";
 
 exports.keywords = [ 'test', 'fields', 'size', 'each', 'object', 'array', 'string', 'number', 'boolean', 'true', 'false', 'should', 'not', 'be', 'equal' ];
 
@@ -18,3 +19,31 @@ exports.lexTable = [
     [ 1,  1,  1,  1,  1,  1,  1,  1,  1  ], // 12: Found Start Block *
     [ 1,  1,  1,  1,  1,  1,  1,  1,  1  ], // 13: Found End Block *
 ];
+
+exports.isStr = (token) => {
+    return token.type === 'str';
+};
+
+exports.isNumber = (token) => {
+    return token.type === 'num';
+};
+
+exports.isIdentifier = (token) => {
+    return token.type === 'id';
+};
+
+exports.isOpeningBrace = (token) => {
+    return token.type === 'op';
+};
+
+exports.isClosingBrace = (token) => {
+    return token.type === 'cl';
+};
+
+exports.isEOF = (token) => {
+    return token.type === 'eof';
+};
+
+exports.isKeyword = (token, kwd) => {
+    return token.type === 'kwd' && token.literal === kwd;
+};

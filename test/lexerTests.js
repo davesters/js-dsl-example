@@ -1,5 +1,7 @@
-var lexer = require('./../lexer');
-var should = require('should');
+"use strict";
+
+let lexer = require('./../lexer');
+let should = require('should');
 
 describe('Lexer', function() {
 
@@ -13,14 +15,49 @@ describe('Lexer', function() {
     var token = tokens.next().value;
     token.type.should.equal('kwd');
     token.literal.should.equal('test');
+    token.line.should.equal(1);
+    token.char.should.equal(1);
 
     token = tokens.next().value;
     token.type.should.equal('id');
     token.literal.should.equal('http://test.api');
+    token.line.should.equal(1);
+    token.char.should.equal(6);
 
     token = tokens.next().value;
     token.type.should.equal('op');
     token.literal.should.equal('{');
+    token.line.should.equal(1);
+    token.char.should.equal(21);
+
+    token = tokens.next().value;
+    token.type.should.equal('eol');
+    token.line.should.equal(1);
+
+    token = tokens.next().value;
+    token.type.should.equal('eof');
+  });
+
+  it('returns correct tokens for (Z => test t {) when t is a string', function() {
+    var tokens = lexer('test "http://test.api" {');
+
+    var token = tokens.next().value;
+    token.type.should.equal('kwd');
+    token.literal.should.equal('test');
+    token.line.should.equal(1);
+    token.char.should.equal(1);
+
+    token = tokens.next().value;
+    token.type.should.equal('str');
+    token.literal.should.equal('http://test.api');
+    token.line.should.equal(1);
+    token.char.should.equal(7);
+
+    token = tokens.next().value;
+    token.type.should.equal('op');
+    token.literal.should.equal('{');
+    token.line.should.equal(1);
+    token.char.should.equal(23);
 
     token = tokens.next().value;
     token.type.should.equal('eol');
