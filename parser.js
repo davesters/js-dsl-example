@@ -13,8 +13,13 @@ ParserException.prototype = Object.create(Error.prototype);
 ParserException.prototype.constructor = ParserException;
 
 module.exports = function(input) {
+	// Pass the input to the lexer to get all the tokens. Lexer errors will get thrown from within.
 	let tokens = lexer(input);
 
+	// Call the starting production. The return value will be the final AST.
+	// Productions sort of recursively call other productions and returning
+	// their final trees which get added up to the final result.
+	// We have to pass around the iterator interface tho.
 	let ast = Z({
 		next: () => {
 			return tokens.next().value;
