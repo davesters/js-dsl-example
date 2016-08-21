@@ -14,12 +14,12 @@ test "https://api.github.com/users/davesters" {
 test "https://api.github.com/users/davesters/repos" {
 
   should be array
-  size should equal 19
+  size should equal 17
 
   each {
 
     should be object
-    size should equal 67
+    size should equal 68
 
     fields {
       private should equal false
@@ -27,8 +27,7 @@ test "https://api.github.com/users/davesters/repos" {
       fields owner {
         login should be string
         id should equal 439674
-        name should equal "David Corona"
-        site_admin should not equal true
+        site_admin should equal false
       }
     }
 

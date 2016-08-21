@@ -1,9 +1,9 @@
 {
   "name": "js-dsl",
   "version": "1.0.0",
-  "repository" : { 
-    "type" : "git",
-    "url" : "https://github.com/davesters/js-dsl-example"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/davesters/js-dsl-example"
   },
   "engines": {
     "node": ">=5.9.0"
@@ -13,6 +13,8 @@
     "should": "^5.1.0"
   },
   "dependencies": {
+    "colors": "^1.1.2",
+    "got": "^6.3.0",
     "lodash": "^3.5.0"
   },
   "scripts": {

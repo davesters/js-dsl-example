@@ -34,7 +34,7 @@ module.exports = (input) => {
 	// List of lines in the input
 	let lines = input.split(os.EOL).map((l) => l + os.EOL + ' ');
 
-	// Add a token to the list of found valid tokens
+	// Function to add a token to the list of found valid tokens
 	let addToken = (type, literal, backtrack) => {
 		let charPos = pointer;
 		
@@ -46,6 +46,7 @@ module.exports = (input) => {
 			}
 		}
 		
+		// Add token to the list of found tokens
 		tokens.push({
 			type: type,
 			literal: literal,
@@ -55,6 +56,8 @@ module.exports = (input) => {
 		token = '';
 		state = 1;
 
+		// If this token requires backtracking, then decrement the pointer
+		// so we can continue at the right place.
 		if (backtrack) {
 			pointer--;
 		}
@@ -65,11 +68,12 @@ module.exports = (input) => {
 		let currentChar = lines[line][pointer];
 		
 		// Get the matching column for this char from the lex table
-		// Runs regex match to over each column. Probably slow. 
+		// Runs regex match over each column. Probably slow, but more concise. 
 		let column = _.findIndex(util.lexTable[0], (regex) => {
 			return currentChar.match(regex);
 		});
 
+		// We did not find any matching states, throw an exception.
 		if (column < 0) {
 			throw new LexerException('Unidentified character "' + currentChar +
 				'" on line: ' + (line + 1) + ', char: ' + (pointer + 1));
@@ -79,9 +83,10 @@ module.exports = (input) => {
 		state = util.lexTable[state][column];
 
 		pointer++;
+		
 		// Check if we have hit a finishing state and act accordingly.
 		switch (state) {
-			case 0:
+			case 0: // This is an invalid finishing state.
 				throw new LexerException('Unexpected character "' + currentChar +
 					'" on line: ' + (line + 1) + ', char: ' + pointer);
 			case 1: // Whitespace. Remain in state 1 
@@ -102,6 +107,7 @@ module.exports = (input) => {
 				break;
 			case 7: // End String
 				// Remove the preceding quote before adding.
+				// We don't need to keep the quotes in the stored token.
 				token = token.substring(1);
 				addToken('str', token);
 				break;
@@ -131,8 +137,9 @@ module.exports = (input) => {
 	let tokenIndex = -1;
 	
 	// We return an object interface with a 'next' and 'backup' function.
-	// 'next' will return the next token. Sort of like an iterator.
-	// 'backup' will back up the cursor one position.
+	// This will act as a sort of iterator for the parser to consume tokens with.
+	// 'next()' will return the next token.
+	// 'backup()' will back up the cursor one position.
 	return {
 
 		next: () => {

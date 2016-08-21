@@ -12,7 +12,7 @@ function ParserException(message) {
 ParserException.prototype = Object.create(Error.prototype);
 ParserException.prototype.constructor = ParserException;
 
-module.exports = function(input) {
+module.exports = (input) => {
 	// Pass the input to the lexer to get all the tokens. Lexer errors will get thrown from within.
 	let tokens = lexer(input);
 
@@ -31,7 +31,7 @@ module.exports = function(input) {
 };
 
 function throwException(token, message) {
-	throw new ParserException(sprintf(message + ' (line: %d, char: %d)', token.line, token.char));
+	throw new ParserException(sprintf('%s (line: %d, char: %d)', message, token.line, token.char));
 }
 
 // Z => S
@@ -160,6 +160,7 @@ function T(tokens) {
 	shouldArgsNode.children.push(E(tokens));
 
 	node.right = shouldArgsNode;
+	node.line = token.line;
 	return node;
 }
 
