@@ -5,16 +5,14 @@ let sprintf = require('util').format;
 let parser = require('./parser');
 let colors = require('colors');
 
+// Keep track of errors so they can be printed at the end
 let errors = [];
-let testCount = 0;
-let indent = 2;
 
-function TestException(message) {
-	this.name = 'InterpreterException';
-	this.message = message;
-}
-TestException.prototype = Object.create(Error.prototype);
-TestException.prototype.constructor = TestException;
+// Keep track of number of tests to print at the end
+let testCount = 0;
+
+// Keep track of how many spaces to indent when printing assertions
+let indent = 2;
 
 function addException(message, line) {
 	errors.push({
@@ -36,25 +34,18 @@ function printAssert(msg, not, failed) {
 
 module.exports = (input) => {
 	// Pass the input to the parser to get the parse tree.
-	let ast = parser(input);
+	let tree = parser(input);
 	
 	// Lets iterate over each test block
-	runTests(0, ast.children);
+	runTests(0, tree.children);
 
-	return ast;
+	return tree;
 };
 
 function runTests(index, tests) {
+	// If there are no more test blocks, then print final messages and exit.
 	if (index > tests.length - 1) {
-		if (errors.length > 0) {
-			console.log('\n' + colors.red.bold(errors.length, 'error(s)'));
-			errors.forEach((err, index) => {
-				console.log('   ', colors.white.bold(index + 1) + '.', '\t', colors.red.bold(sprintf('%s (line %d)', err.msg, err.line)))
-			});
-		}
-
-		console.log(colors.yellow.bold(sprintf('\n%d of %d Test(s) passed with %d error(s)', testCount, testCount + errors.length, errors.length)));
-
+		printSummary();
 		process.exit(errors.length > 0 ? 1: 0);
 	}
 
@@ -72,6 +63,7 @@ function runTests(index, tests) {
 		});
 }
 
+// Generic handler for a block of statements
 function handleBlock(block, data) {
 	block.children.forEach(el => {
 		handleBlockChild(el, data);
@@ -106,6 +98,7 @@ function handleBlockChild(child, data) {
 			}
 
 			indent += 2;
+			// Iterate over each child in the array and run the statements for each
 			childData.forEach((c, index) => {
 				console.log(colors.cyan(' '.repeat(indent) + 'child ' + (index + 1)));
 				indent += 2;
@@ -214,4 +207,19 @@ function handleShouldEqual(expected, property, data, not, line) {
 	}
 
 	printAssert(test, not, failed);
+}
+
+function printSummary() {
+	if (errors.length > 0) {
+		printErrors();
+	}
+
+	console.log(colors.yellow.bold(sprintf('\n%d of %d Test(s) passed with %d error(s)', testCount, testCount + errors.length, errors.length)));
+}
+
+function printErrors() {
+	console.log('\n' + colors.red.bold(errors.length, 'error(s)'));
+	errors.forEach((err, index) => {
+		console.log('   ', colors.white.bold(index + 1) + '.', '\t', colors.red.bold(sprintf('%s (line %d)', err.msg, err.line)))
+	});
 }
