@@ -142,7 +142,7 @@ function handleShouldBe(expected, actual, not, line) {
 				failed = true;
 			}
 			if (!not && !(actual instanceof Object)) {
-				addException('Expected to find Object', line);
+				addException('Expected to find Object but found ' + Object.prototype.toString.call(actual), line);
 				failed = true;
 			}
 			break;
@@ -152,7 +152,7 @@ function handleShouldBe(expected, actual, not, line) {
 				failed = true;
 			}
 			if (!not && !(actual instanceof Array)) {
-				addException('Expected to find Array', line);
+				addException('Expected to find Array but found ' + Object.prototype.toString.call(actual), line);
 				failed = true;
 			}
 			break;
@@ -162,7 +162,7 @@ function handleShouldBe(expected, actual, not, line) {
 				failed = true;
 			}
 			if (!not && typeof actual !== expected) {
-				addException('Expected to find ' + expected, line);
+				addException('Expected to find ' + expected + ' but found ' + Object.prototype.toString.call(actual), line);
 				failed = true;
 			}
 			break;
@@ -199,7 +199,7 @@ function handleShouldEqual(expected, property, data, not, line) {
 			failed = true;
 		}
 		if (!not && actualProperty !== expected) {
-			addException(sprintf('Expected %s to equal %s', property, expected), line);
+			addException(sprintf('Expected %s to equal %s but found %s', property, expected, actualProperty), line);
 			failed = true;
 		}
 
